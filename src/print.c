@@ -77,7 +77,7 @@ void print_context_append(const char *line, size_t len) {
 }
 
 void print_trailing_context(const char *path, const char *buf, size_t n) {
-    char sep = '-';
+    char sep = ' ';
 
     if (opts.ackmate || opts.vimgrep) {
         sep = ':';
@@ -86,7 +86,7 @@ void print_trailing_context(const char *path, const char *buf, size_t n) {
     if (print_context.lines_since_last_match != 0 &&
         print_context.lines_since_last_match <= opts.after) {
         if (opts.print_path == PATH_PRINT_EACH_LINE) {
-            print_path(path, ':');
+            print_path(path, ' ');
         }
         print_line_number(print_context.line, sep);
 
@@ -148,7 +148,7 @@ void print_binary_file_matches(const char *path) {
 void print_file_matches(const char *path, const char *buf, const size_t buf_len, const match_t matches[], const size_t matches_len) {
     size_t cur_match = 0;
     ssize_t lines_to_print = 0;
-    char sep = '-';
+    char sep = ' ';
     size_t i, j;
     int blanks_between_matches = opts.context || opts.after || opts.before;
 
@@ -177,7 +177,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
             print_context.in_a_match = TRUE;
             /* We found the start of a match */
             if (cur_match > 0 && blanks_between_matches && print_context.lines_since_last_match > (opts.before + opts.after + 1)) {
-                fprintf(out_fd, "--\n");
+                fprintf(out_fd, "---\n");
             }
 
             if (print_context.lines_since_last_match > 0 && opts.before > 0) {
@@ -194,7 +194,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
                     print_context.prev_line = (print_context.last_prev_line + j) % opts.before;
                     if (print_context.context_prev_lines[print_context.prev_line] != NULL) {
                         if (opts.print_path == PATH_PRINT_EACH_LINE) {
-                            print_path(path, ':');
+                            print_path(path, ' ');
                         }
                         print_line_number(print_context.line - (opts.before - j), sep);
                         fprintf(out_fd, "%s\n", print_context.context_prev_lines[print_context.prev_line]);
@@ -219,7 +219,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
         if (i == buf_len || buf[i] == '\n') {
             if (print_context.lines_since_last_match == 0) {
                 if (opts.print_path == PATH_PRINT_EACH_LINE && !opts.search_stream) {
-                    print_path(path, ':');
+                    print_path(path, ' ');
                 }
                 if (opts.ackmate) {
                     /* print headers for ackmate to parse */
@@ -240,7 +240,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
                         print_line(buf, i, print_context.prev_line_offset);
                     }
                 } else {
-                    print_line_number(print_context.line, ':');
+                    print_line_number(print_context.line, ' ');
                     int printed_match = FALSE;
                     if (opts.column) {
                         print_column_number(matches, print_context.last_printed_match, print_context.prev_line_offset, ':');
@@ -280,7 +280,7 @@ void print_file_matches(const char *path, const char *buf, const size_t buf_len,
                                 if (opts.print_path == PATH_PRINT_EACH_LINE) {
                                     print_path(path, ':');
                                 }
-                                print_line_number(print_context.line, ':');
+                                print_line_number(print_context.line, ' ');
                                 if (opts.column) {
                                     print_column_number(matches, print_context.last_printed_match, print_context.prev_line_offset, ':');
                                 }
@@ -336,9 +336,9 @@ void print_line_number(size_t line, const char sep) {
         return;
     }
     if (opts.color) {
-        fprintf(out_fd, "%s%lu%s%c", opts.color_line_number, (unsigned long)line, color_reset, sep);
+        fprintf(out_fd, "%s%.4lu%s%c", opts.color_line_number, (unsigned long)line, color_reset, sep);
     } else {
-        fprintf(out_fd, "%lu%c", (unsigned long)line, sep);
+        fprintf(out_fd, "%.4lu%c", (unsigned long)line, sep);
     }
 }
 
@@ -353,7 +353,7 @@ void print_column_number(const match_t matches[], size_t last_printed_match,
 
 void print_file_separator(void) {
     if (first_file_match == 0 && opts.print_break) {
-        fprintf(out_fd, "\n");
+        fprintf(out_fd, "\n\n");
     }
     first_file_match = 0;
 }
